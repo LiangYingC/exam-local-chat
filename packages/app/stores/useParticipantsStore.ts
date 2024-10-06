@@ -30,6 +30,12 @@ const useParticipantsStore = create<ParticipantsState>()(
           const participant = state.participants[username] || {
             connections: [],
           };
+          const isExistedConnection = participant.connections.some(
+            ({ id }) => id === connectionId,
+          );
+          if (isExistedConnection) {
+            return state;
+          }
           const newConnection = {
             id: connectionId,
             lastHeartbeatTime: Date.now(),
