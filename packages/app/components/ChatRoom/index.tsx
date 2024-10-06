@@ -2,7 +2,7 @@ import { Box, TextField } from "@mui/material";
 import type { ChangeEvent, FC, KeyboardEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useChatMessagesStore from "../../stores/useChatMessagesStore";
-import useParticipantCountsStore from "../../stores/useParticipantCountsStore";
+import useParticipantsStore from "../../stores/useParticipantsStore";
 import useUserSessionStore from "../../stores/useUserSessionStore";
 import type { ChatMessageWithoutIdAndTimestamp } from "../../types/message";
 import { ChatMessageType } from "../../types/message";
@@ -26,7 +26,7 @@ const ChatRoom: FC = () => {
     removeParticipant,
     checkIsFirstJoin,
     checkIsLastLeave,
-  } = useParticipantCountsStore();
+  } = useParticipantsStore();
 
   const isSentJoinedMessageRef = useRef<boolean>(false);
   const textInputRef = useRef<HTMLInputElement>(null);

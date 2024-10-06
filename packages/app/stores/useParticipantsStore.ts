@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface ParticipantCountsState {
+interface ParticipantsState {
   participants: { [username: string]: number };
   addParticipant: (username: string) => void;
   removeParticipant: (username: string) => void;
@@ -9,7 +9,7 @@ interface ParticipantCountsState {
   checkIsLastLeave: (username: string) => boolean;
 }
 
-const useParticipantCountsStore = create<ParticipantCountsState>()(
+const useParticipantsStore = create<ParticipantsState>()(
   persist(
     (set, get) => ({
       participants: {},
@@ -51,4 +51,4 @@ const useParticipantCountsStore = create<ParticipantCountsState>()(
   ),
 );
 
-export default useParticipantCountsStore;
+export default useParticipantsStore;
