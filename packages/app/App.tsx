@@ -7,8 +7,8 @@ const ChatRoom = lazy(() => import("./components/ChatRoom"));
 const Entrance = lazy(() => import("./components/Entrance"));
 
 const App: FC = () => {
-  const localUsername = useUserSessionStore((state) => state.localUsername);
-  const isJoined = Boolean(localUsername);
+  const userSession = useUserSessionStore((state) => state.userSession);
+  const isJoined = Boolean(userSession);
 
   return (
     <Suspense

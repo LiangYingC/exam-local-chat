@@ -15,8 +15,10 @@ const Messages: FC<MessagesProps> = ({
   shouldAutoScrollToBottom,
   setShouldAutoScrollToBottom,
 }) => {
-  const localUsername = useUserSessionStore((state) => state.localUsername);
+  const userSession = useUserSessionStore((state) => state.userSession);
   const chatMessages = useChatMessagesStore((state) => state.chatMessages);
+
+  const localUsername = userSession?.username || "";
 
   const { rootRef: chatBoxRef, targetRef: messagesEndRef } =
     useIntersectionObserver<HTMLDivElement>({

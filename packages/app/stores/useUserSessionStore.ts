@@ -1,16 +1,23 @@
+import { nanoid } from "nanoid";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+interface UserSession {
+  username: string;
+  connectionId: string;
+}
+
 interface UserSessionState {
-  localUsername: string;
-  setLocalUsername: (localUsername: string) => void;
+  userSession: UserSession | null;
+  setLocalUsername: (username: string) => void;
 }
 
 const useUserSessionStore = create<UserSessionState>()(
   persist(
     (set) => ({
-      localUsername: "",
-      setLocalUsername: (localUsername: string) => set({ localUsername }),
+      userSession: null,
+      setLocalUsername: (username: string) =>
+        set({ userSession: { username, connectionId: nanoid() } }),
     }),
     {
       name: "user-session-storage",

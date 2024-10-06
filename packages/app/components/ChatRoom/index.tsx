@@ -11,7 +11,9 @@ import Layout from "../Layout";
 import Messages from "./Messages";
 
 const ChatRoom: FC = () => {
-  const localUsername = useUserSessionStore((state) => state.localUsername);
+  const userSession = useUserSessionStore((state) => state.userSession);
+  const localUsername = userSession?.username || "";
+
   const sendChatMessage = useChatMessagesStore(
     (state) => state.sendChatMessage,
   );
