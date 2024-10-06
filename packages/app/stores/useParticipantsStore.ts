@@ -1,10 +1,19 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+interface ParticipantConnection {
+  id: string;
+  lastHeartbeatTime: number;
+}
+
 interface ParticipantsState {
-  participants: { [username: string]: number };
-  addParticipant: (username: string) => void;
-  removeParticipant: (username: string) => void;
+  participants: {
+    [username: string]: {
+      connections: ParticipantConnection[];
+    };
+  };
+  addParticipant: (username: string, connectionId: string) => void;
+  removeParticipant: (username: string, connectionId: string) => void;
   checkIsFirstJoin: (username: string) => boolean;
   checkIsLastLeave: (username: string) => boolean;
 }
@@ -13,35 +22,55 @@ const useParticipantsStore = create<ParticipantsState>()(
   persist(
     (set, get) => ({
       participants: {},
-      addParticipant: (username) =>
+      addParticipant: (username, connectionId) =>
         set((state) => {
-          const currentCount = state.participants[username] || 0;
-          const newCount = currentCount + 1;
+          if (!username || !connectionId) {
+            return state;
+          }
+          const participant = state.participants[username] || {
+            connections: [],
+          };
+          const newConnection = {
+            id: connectionId,
+            lastHeartbeatTime: Date.now(),
+          };
           return {
             participants: {
               ...state.participants,
-              [username]: newCount,
+              [username]: {
+                connections: [...participant.connections, newConnection],
+              },
             },
           };
         }),
-      removeParticipant: (username) =>
+      removeParticipant: (username, connectionId) =>
         set((state) => {
           const newParticipants = { ...state.participants };
-          const currentCount = newParticipants[username] || 0;
-          const newCount = Math.max(currentCount - 1, 0);
-          if (newCount === 0) {
-            delete newParticipants[username];
+          const participant = newParticipants[username];
+
+          if (!participant) {
+            return state;
+          }
+          const newConnections = participant.connections.filter(
+            ({ id }) => id !== connectionId,
+          );
+
+          if (newConnections && newConnections.length > 0) {
+            newParticipants[username] = {
+              ...participant,
+              connections: newConnections,
+            };
           } else {
-            newParticipants[username] = newCount;
+            delete newParticipants[username];
           }
           return { participants: newParticipants };
         }),
       checkIsFirstJoin: (username) => {
-        const count = get().participants[username];
-        return count === undefined;
+        const count = get().participants[username]?.connections.length || 0;
+        return count === 0;
       },
       checkIsLastLeave: (username) => {
-        const count = get().participants[username];
+        const count = get().participants[username]?.connections.length || 1;
         return count === 1;
       },
     }),

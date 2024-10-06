@@ -13,6 +13,7 @@ import Messages from "./Messages";
 const ChatRoom: FC = () => {
   const userSession = useUserSessionStore((state) => state.userSession);
   const localUsername = userSession?.username || "";
+  const localUserConnectionId = userSession?.connectionId || "";
 
   const sendChatMessage = useChatMessagesStore(
     (state) => state.sendChatMessage,
@@ -75,9 +76,15 @@ const ChatRoom: FC = () => {
           username: localUsername,
         });
       }
-      addParticipant(localUsername);
+      addParticipant(localUsername, localUserConnectionId);
     }
-  }, [localUsername, sendChatMessage, checkIsFirstJoin, addParticipant]);
+  }, [
+    localUsername,
+    localUserConnectionId,
+    sendChatMessage,
+    checkIsFirstJoin,
+    addParticipant,
+  ]);
 
   useEffect(() => {
     const handleLeave = () => {
@@ -87,13 +94,19 @@ const ChatRoom: FC = () => {
           username: localUsername,
         });
       }
-      removeParticipant(localUsername);
+      removeParticipant(localUsername, localUserConnectionId);
     };
     window.addEventListener("beforeunload", handleLeave);
     return () => {
       window.removeEventListener("beforeunload", handleLeave);
     };
-  }, [localUsername, sendChatMessage, checkIsLastLeave, removeParticipant]);
+  }, [
+    localUsername,
+    localUserConnectionId,
+    sendChatMessage,
+    checkIsLastLeave,
+    removeParticipant,
+  ]);
 
   return (
     <Layout title="輸入訊息，隨性交流">
