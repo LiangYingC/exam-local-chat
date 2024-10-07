@@ -51,7 +51,7 @@ const ChatRoom: FC = () => {
       e.preventDefault();
       const newMessage: ChatMessageWithoutIdAndTimestamp = {
         type: ChatMessageType.Text,
-        username: localUsername,
+        sender: localUsername,
         message: textInputRef.current.value,
       };
       textInputRef.current.value = "";
@@ -63,19 +63,19 @@ const ChatRoom: FC = () => {
   useEffect(() => {
     channel.onmessage = (event) => {
       if (!event.data) return;
-      const { type, username, connectionId } = event.data;
+      const { type, sender, connectionId } = event.data;
       switch (type) {
         case ChatMessageType.Joined:
-          if (checkIsFirstJoin(username)) {
+          if (checkIsFirstJoin(sender)) {
             receiveChatMessage(event.data);
           }
-          addParticipant(username, connectionId);
+          addParticipant(sender, connectionId);
           break;
         case ChatMessageType.Left:
-          if (checkIsLastLeave(username)) {
+          if (checkIsLastLeave(sender)) {
             receiveChatMessage(event.data);
           }
-          removeParticipant(username, connectionId);
+          removeParticipant(sender, connectionId);
           break;
         default:
           receiveChatMessage(event.data);
@@ -97,7 +97,7 @@ const ChatRoom: FC = () => {
       isSentJoinedMessageRef.current = true;
       sendChatMessage({
         type: ChatMessageType.Joined,
-        username: localUsername,
+        sender: localUsername,
         connectionId: localUserConnectionId,
         shouldUpdateStore: checkIsFirstJoin(localUsername),
       });
@@ -115,7 +115,7 @@ const ChatRoom: FC = () => {
     const handleLeave = () => {
       sendChatMessage({
         type: ChatMessageType.Left,
-        username: localUsername,
+        sender: localUsername,
         connectionId: localUserConnectionId,
         shouldUpdateStore: checkIsLastLeave(localUsername),
       });

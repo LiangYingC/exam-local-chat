@@ -23,7 +23,7 @@ export const useChatMessagesStore = create<ChatMessagesState>()(
       chatMessages: [],
       sendChatMessage: ({
         type,
-        username,
+        sender,
         message = "",
         connectionId = "",
         shouldUpdateStore = true,
@@ -32,7 +32,7 @@ export const useChatMessagesStore = create<ChatMessagesState>()(
           id: nanoid(),
           timestamp: Date.now(),
           type,
-          username,
+          sender,
           message,
           connectionId,
         };

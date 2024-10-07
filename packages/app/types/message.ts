@@ -8,7 +8,7 @@ export interface ChatMessage {
   id: string;
   timestamp: number;
   type: ChatMessageType;
-  username: string;
+  sender: string;
   message?: string;
   connectionId?: string;
 }

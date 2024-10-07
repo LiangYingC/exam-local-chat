@@ -9,9 +9,9 @@ interface MessageProps {
 }
 
 const Message: FC<MessageProps> = ({ localUsername, chatMessage }) => {
-  const { type, username } = chatMessage;
+  const { type, sender, timestamp } = chatMessage;
   const isTextTypeMessage = type === ChatMessageType.Text;
-  const isLocalUserMessage = localUsername === username;
+  const isLocalUserMessage = localUsername === sender;
 
   return isTextTypeMessage ? (
     <Box
@@ -24,7 +24,7 @@ const Message: FC<MessageProps> = ({ localUsername, chatMessage }) => {
     >
       {!isLocalUserMessage && (
         <Typography variant="body2" sx={{ margin: "0 2px" }}>
-          {username}
+          {sender}
         </Typography>
       )}
       <Box
@@ -58,11 +58,9 @@ const Message: FC<MessageProps> = ({ localUsername, chatMessage }) => {
         fontStyle: "italic",
       }}
     >
-      <Typography variant="body1">
-        {`${chatMessage.username} ${chatMessage.type}`}
-      </Typography>
+      <Typography variant="body1">{`${sender} ${type}`}</Typography>
       <Typography variant="caption" sx={{ margin: "0 8px" }}>
-        {convertTimestampToLocalTime(chatMessage.timestamp)}
+        {convertTimestampToLocalTime(timestamp)}
       </Typography>
     </Box>
   );
