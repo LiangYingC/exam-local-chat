@@ -15,12 +15,7 @@ const ChatRoom: FC = () => {
   const localUsername = userSession?.username || "";
   const localUserConnectionId = userSession?.connectionId || "";
 
-  const sendChatMessage = useChatMessagesStore(
-    (state) => state.sendChatMessage,
-  );
-  const receiveChatMessage = useChatMessagesStore(
-    (state) => state.receiveChatMessage,
-  );
+  const { sendChatMessage, receiveChatMessage } = useChatMessagesStore();
 
   const {
     addParticipant,
