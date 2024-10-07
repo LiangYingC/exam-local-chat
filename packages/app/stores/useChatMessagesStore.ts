@@ -7,9 +7,13 @@ import type {
 } from "../types/message";
 import { broadCastChatMessage } from "../utils/broadcastChannel";
 
+interface SendChatMessageParams extends ChatMessageWithoutIdAndTimestamp {
+  shouldUpdateStore?: boolean;
+}
+
 interface ChatMessagesState {
   chatMessages: ChatMessage[];
-  sendChatMessage: (params: ChatMessageWithoutIdAndTimestamp) => void;
+  sendChatMessage: (params: SendChatMessageParams) => void;
   receiveChatMessage: (message: ChatMessage) => void;
 }
 
@@ -17,16 +21,27 @@ export const useChatMessagesStore = create<ChatMessagesState>()(
   persist(
     (set) => ({
       chatMessages: [],
-      sendChatMessage: ({ type, username, message = "" }) => {
+      sendChatMessage: ({
+        type,
+        username,
+        message = "",
+        connectionId = "",
+        shouldUpdateStore = true,
+      }) => {
         const newMessage: ChatMessage = {
           id: nanoid(),
           timestamp: Date.now(),
           type,
           username,
           message,
+          connectionId,
         };
-        set((state) => ({ chatMessages: [...state.chatMessages, newMessage] }));
         broadCastChatMessage(newMessage);
+        if (shouldUpdateStore) {
+          set((state) => ({
+            chatMessages: [...state.chatMessages, newMessage],
+          }));
+        }
       },
       receiveChatMessage: (newMessage: ChatMessage) => {
         set((state) => {

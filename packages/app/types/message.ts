@@ -10,6 +10,7 @@ export interface ChatMessage {
   type: ChatMessageType;
   username: string;
   message?: string;
+  connectionId?: string;
 }
 
 export type ChatMessageWithoutIdAndTimestamp = Omit<

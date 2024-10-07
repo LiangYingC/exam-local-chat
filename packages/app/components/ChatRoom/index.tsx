@@ -61,21 +61,46 @@ const ChatRoom: FC = () => {
   };
 
   useEffect(() => {
-    channel.onmessage = (event) => receiveChatMessage(event.data);
+    channel.onmessage = (event) => {
+      if (!event.data) return;
+      const { type, username, connectionId } = event.data;
+      switch (type) {
+        case ChatMessageType.Joined:
+          if (checkIsFirstJoin(username)) {
+            receiveChatMessage(event.data);
+          }
+          addParticipant(username, connectionId);
+          break;
+        case ChatMessageType.Left:
+          if (checkIsLastLeave(username)) {
+            receiveChatMessage(event.data);
+          }
+          removeParticipant(username, connectionId);
+          break;
+        default:
+          receiveChatMessage(event.data);
+      }
+    };
     return () => {
       channel.onmessage = null;
     };
-  }, [receiveChatMessage]);
+  }, [
+    addParticipant,
+    removeParticipant,
+    receiveChatMessage,
+    checkIsFirstJoin,
+    checkIsLastLeave,
+  ]);
 
   useEffect(() => {
     if (!isSentJoinedMessageRef.current) {
       isSentJoinedMessageRef.current = true;
-      if (checkIsFirstJoin(localUsername)) {
-        sendChatMessage({
-          type: ChatMessageType.Joined,
-          username: localUsername,
-        });
-      }
+      sendChatMessage({
+        type: ChatMessageType.Joined,
+        username: localUsername,
+        connectionId: localUserConnectionId,
+        shouldUpdateStore: checkIsFirstJoin(localUsername),
+      });
       addParticipant(localUsername, localUserConnectionId);
     }
   }, [
@@ -88,12 +113,12 @@ const ChatRoom: FC = () => {
 
   useEffect(() => {
     const handleLeave = () => {
-      if (checkIsLastLeave(localUsername)) {
-        sendChatMessage({
-          type: ChatMessageType.Left,
-          username: localUsername,
-        });
-      }
+      sendChatMessage({
+        type: ChatMessageType.Left,
+        username: localUsername,
+        connectionId: localUserConnectionId,
+        shouldUpdateStore: checkIsLastLeave(localUsername),
+      });
       removeParticipant(localUsername, localUserConnectionId);
     };
     window.addEventListener("beforeunload", handleLeave);
